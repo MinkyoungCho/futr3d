@@ -11,7 +11,8 @@ from mmdet.models.utils.transformer import inverse_sigmoid
 from mmdet3d.models.builder import HEADS
 from mmdet.models.dense_heads.detr_head import DETRHead
 from mmdet3d.models import builder
-from plugin.fudet.core.bbox.utils import normalize_bbox, denormalize_bbox
+from plugin.futr3d.core.bbox.utils import normalize_bbox, denormalize_bbox
+import wandb
 
 @HEADS.register_module()
 class FUTR3DHead(DETRHead):
@@ -302,6 +303,7 @@ class FUTR3DHead(DETRHead):
             loss_dict[f'd{num_dec_layer}.loss_cls'] = loss_cls_i
             loss_dict[f'd{num_dec_layer}.loss_bbox'] = loss_bbox_i
             num_dec_layer += 1
+            
         return loss_dict
     
     def loss_single(self,
@@ -376,6 +378,8 @@ class FUTR3DHead(DETRHead):
 
         loss_cls = torch.nan_to_num(loss_cls)
         loss_bbox = torch.nan_to_num(loss_bbox)
+        
+        wandb.log({"loss_cls": loss_cls, "loss_bbox": loss_bbox})
         return loss_cls, loss_bbox
 
     def get_targets(self,

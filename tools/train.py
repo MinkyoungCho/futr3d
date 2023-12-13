@@ -21,6 +21,7 @@ from mmdet3d.models import build_model
 from mmdet3d.utils import collect_env, get_root_logger
 from mmdet.apis import set_random_seed
 from mmseg import __version__ as mmseg_version
+import wandb
 
 try:
     # If mmdet version > 2.20.0, setup_multi_processes would be imported and
@@ -117,6 +118,8 @@ def main():
     args = parse_args()
 
     cfg = Config.fromfile(args.config)
+    wandb.init(project="futr3d-basic", config=cfg)
+
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
 
@@ -284,4 +287,5 @@ def main():
 
 
 if __name__ == '__main__':
+    torch.multiprocessing.set_start_method('fork')
     main()
